@@ -95,6 +95,19 @@
   - `README.md`: GitHub Actions自動デプロイ手順（リポジトリの Pages 設定を「GitHub Actions」にするだけ）および手動デプロイ手順を解説。
   - `npm run lint`（エラー0件）、`npm run test`（23件全パス）、`npm run build`（正常完了）を確認。
 
+---
+
+## [Phase 6: GitHub Actions Lockfile Resolution & CI/CD Resilience - BDD / TDD]
+- **RED**:
+  - `src/__tests__/build-config.test.ts` に `package-lock.json` のルート存在検証シナリオを追加。
+- **GREEN**:
+  - `npm i --package-lock-only` を実行して、npm公式依存関係ロックファイル `package-lock.json` をルートディレクトリに生成。
+  - `.github/workflows/deploy.yml` のインストールステップを `if [ -f package-lock.json ]; then npm ci; else npm install; fi` に改修し、lockfileの有無に関わらずビルドが確実に走る弾力性を確保。
+  - テスト全24件が合格。
+- **REFACTOR**:
+  - Gitリポジトリに `package-lock.json` を確実に追跡対象としてコミット。
+  - CI実行環境での `actions/setup-node@v4` キャッシュ検証・ビルド整合性を確認。
+
 
 
 

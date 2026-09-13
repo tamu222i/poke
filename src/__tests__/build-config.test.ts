@@ -22,5 +22,10 @@ describe('Feature: GitHub Pages Build Configuration', () => {
       expect(html).not.toMatch(/(src|href)="\/assets\//);
     }
   });
+
+  it('Scenario: package-lock.json exists in root for GitHub Actions CI/CD npm setup and caching', () => {
+    const lockPath = path.resolve(process.cwd(), 'package-lock.json');
+    expect(fs.existsSync(lockPath)).toBe(true);
+  });
 });
 
