@@ -1,0 +1,6 @@
+{
+  "name": "ポケモン図鑑",
+  "description": "第1世代から幅広く網羅し、タイプ相性・ステータス・進化系統・鳴き声・詳細情報を備えたスキーマ駆動＆DDD構成の堅牢なポケモン図鑑",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
