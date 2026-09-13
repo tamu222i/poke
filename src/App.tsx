@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { usePokedex } from './presentation/hooks/usePokedex';
 import { PokedexHeader } from './presentation/components/PokedexHeader';
 import { TypeFilterBar } from './presentation/components/TypeFilterBar';
@@ -5,7 +6,9 @@ import { PokemonCard } from './presentation/components/PokemonCard';
 import { PokemonDetailModal } from './presentation/components/PokemonDetailModal';
 import { PokemonCompareModal } from './presentation/components/PokemonCompareModal';
 import { PokedexFooter } from './presentation/components/PokedexFooter';
-import { SearchX, Sparkles } from 'lucide-react';
+import { SearchX, ChevronDown, Eye } from 'lucide-react';
+
+const PAGE_SIZE = 48;
 
 export default function App() {
   const {
@@ -42,6 +45,13 @@ export default function App() {
     handleStartCompare,
   } = usePokedex();
 
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+
+  // Reset pagination when filter criteria change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchQuery, selectedType, selectedGeneration, sortBy, onlyFavorites, isLegendaryOnly]);
+
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedType(undefined);
@@ -49,7 +59,11 @@ export default function App() {
     setSortBy('number_asc');
     setOnlyFavorites(false);
     setIsLegendaryOnly(false);
+    setVisibleCount(PAGE_SIZE);
   };
+
+  const visiblePokemonList = pokemonList.slice(0, visibleCount);
+  const remainingCount = pokemonList.length - visibleCount;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
@@ -89,21 +103,48 @@ export default function App() {
 
       {/* 3. Main Content: Pokemon Grid */}
       <main id="pokedex-main-grid" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-        {pokemonList.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {pokemonList.map((pokemon) => (
-              <PokemonCard
-                key={pokemon.id}
-                pokemon={pokemon}
-                isFavorite={favoriteIds.includes(pokemon.id)}
-                isPlayingCry={playingId === pokemon.id}
-                onSelect={handleSelectPokemon}
-                onToggleFavorite={handleToggleFavorite}
-                onPlayCry={handlePlayCry}
-                onCompare={handleStartCompare}
-              />
-            ))}
-          </div>
+        {visiblePokemonList.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {visiblePokemonList.map((pokemon) => (
+                <PokemonCard
+                  key={pokemon.id}
+                  pokemon={pokemon}
+                  isFavorite={favoriteIds.includes(pokemon.id)}
+                  isPlayingCry={playingId === pokemon.id}
+                  onSelect={handleSelectPokemon}
+                  onToggleFavorite={handleToggleFavorite}
+                  onPlayCry={handlePlayCry}
+                  onCompare={handleStartCompare}
+                />
+              ))}
+            </div>
+
+            {/* Load More / Show All Bar */}
+            {remainingCount > 0 && (
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  id="load-more-btn"
+                  type="button"
+                  onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                  className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 hover:scale-102 transition-all cursor-pointer"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  <span>さらに表示する（残り {remainingCount} 匹）</span>
+                </button>
+
+                <button
+                  id="show-all-btn"
+                  type="button"
+                  onClick={() => setVisibleCount(pokemonList.length)}
+                  className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium text-xs border border-slate-700 transition-all cursor-pointer"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>全 {pokemonList.length} 匹を一括表示</span>
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           /* Empty State */
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">

@@ -84,6 +84,31 @@ src/
 
 ---
 
+### フェーズ 4: データセット拡張 (300匹規模・第1〜3世代完全網羅)
+- **Red**:
+  - `pokemon-dataset.test.ts` を追加し、データセットが300匹以上存在すること、Zodスキーマ検証を全件パスすること、各世代（カントー・ジョウト・ホウエン）が整合していることのBDDテストを作成。
+- **Green**:
+  - PokeAPIおよび公式準拠のデータからNo.1〜No.386（第1〜3世代全386匹）の日本語名・英語名・ローマ字・タイプ・種族値・分類・解説文・スプライト・鳴き声URLを構築。
+  - Zodの `PokemonDataSchema` で全件バリデーションを実施。
+- **Refactor**:
+  - 大量データ（386匹）に対応した検索最適化、無限スクロールまたはページネーション/スムーズな描画処理、フィルター動作のパフォーマンス改善。
+  - Gitコミット (Red -> Green -> Refactor) を徹底。
+
+---
+
+### フェーズ 5: GitHub Pages (`*.github.io`) デプロイ対応
+- **Red**:
+  - 相対パス (`base: './'`) 適用およびビルド成果物 `dist/index.html` の相対リンク検証テスト作成。
+- **Green**:
+  - `vite.config.ts`: `base: './'` の設定により、任意のサブディレクトリ（例: `https://<user>.github.io/<repo>/`）でもアセットが正常に解決されるように構成。
+  - `.github/workflows/deploy.yml`: GitHub Actions を用いた自動テスト・ビルド・GitHub Pages への自動デプロイワークフローを構築。
+  - `package.json`: `gh-pages` による手動ワンコマンドデプロイ (`npm run deploy`) 用スクリプトを追加。
+  - `README.md`: GitHub Pages へのデプロイ手順（リポジトリ設定・GitHub Actions有効化手順）のドキュメント化。
+- **Refactor**:
+  - ビルド成果物の整合性テスト、CI/CD手順の検証。
+
+---
+
 ## 4. 品質基準
 - 全てのユニット・BDDテストがパスすること (`npm run test`)
 - TypeScript型チェックエラーが0件であること (`npm run lint`)

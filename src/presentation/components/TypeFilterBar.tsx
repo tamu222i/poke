@@ -36,7 +36,11 @@ export function TypeFilterBar({
   filteredCount,
   onResetFilters,
 }: TypeFilterBarProps) {
-  const generations = [1, 2, 3, 4, 6, 7, 9];
+  const generationList = [
+    { gen: 1, name: 'カントー', count: 151 },
+    { gen: 2, name: 'ジョウト', count: 100 },
+    { gen: 3, name: 'ホウエン', count: 135 },
+  ];
 
   const hasActiveFilters =
     selectedType !== undefined ||
@@ -65,19 +69,22 @@ export function TypeFilterBar({
             >
               すべて
             </button>
-            {generations.map((gen) => (
+            {generationList.map(({ gen, name, count }) => (
               <button
                 key={gen}
                 id={`gen-filter-${gen}`}
                 type="button"
                 onClick={() => onSelectGeneration(selectedGeneration === gen ? undefined : gen)}
-                className={`px-2.5 py-1 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-2.5 py-1 rounded-full font-medium transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                   selectedGeneration === gen
                     ? 'bg-red-600 text-white shadow-sm shadow-red-500/50'
                     : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                 }`}
               >
-                第{gen}世代
+                <span>第{gen}世代 ({name})</span>
+                <span className="text-[10px] opacity-75 font-mono">
+                  {count}
+                </span>
               </button>
             ))}
           </div>

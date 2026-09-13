@@ -65,3 +65,36 @@
   - TypeScript型安全性の修正（readonlyミュータビリティ不整合の解消）。
   - `npm run lint` (エラー0件)、`npm run test` (17件パス)、`npm run build` (成功) を達成。
 
+---
+
+## [Phase 4: Massive Dataset Expansion (300+ Pokemon: Gen 1 - Gen 3) - BDD / TDD]
+- **RED**:
+  - `src/infrastructure/__tests__/pokemon-dataset.test.ts` を作成。データセット件数が300件以上あること、Zodスキーマ検証が全件通ること、第1世代（カントー）、第2世代（ジョウト）、第3世代（ホウエン）が整合していることを検証するBDDテストを記述し、失敗（21件でFAIL）を確認。
+- **GREEN**:
+  - `scripts/generate-dataset.mjs`: PokeAPI公式CSVおよびPurukittoオープンリポジトリから、No.001〜No.386（第1〜第3世代完結、合計386匹）の日本語名・英語名・ローマ字・タイプ・種族値・高さ・重さ・特性・分類・解説文・公式スプライトURL・公式鳴き声URLを統合・生成。
+  - `src/infrastructure/data/pokemon-dataset.ts`: 386匹の完全なマスターデータを構築し、Zodスキーマによる厳格な型検証を全件クリア。
+  - 全21件のBDD/TDDテストがオールグリーン（PASS）。
+- **REFACTOR**:
+  - `TypeFilterBar.tsx`: 世代選択UIを第1世代（カントー: 151匹）、第2世代（ジョウト: 100匹）、第3世代（ホウエン: 135匹）の地域名・件数バッジ付きボタンに刷新。
+  - `App.tsx`: 386匹の大量描画に対応するため、プログレッシブローディング（初期表示48匹＋「さらに48匹表示（残り○○匹）」＋「全件一括表示」）を実装し、レンダリング負荷の削減と爆速表示を両立。
+  - `package.json`: `generate:dataset` 再現スクリプトを登録。
+  - `npm run lint`（型エラー0件）、`npm run test`（21件全パス）、`npm run build`（成功）を達成。
+
+---
+
+## [Phase 5: GitHub Pages (*.github.io) Deployment Support - BDD / TDD]
+- **RED**:
+  - `src/__tests__/build-config.test.ts` を作成。Viteの設定で `base: './'`（相対パス）が指定されており、`https://<username>.github.io/<repo>/` のようなサブパス環境でもCSSやJSのアセット解決が壊れないことを検証するテストを記述し、未設定によるテスト失敗（FAIL）を確認。
+- **GREEN**:
+  - `vite.config.ts`: `base: './'` を明示的に設定。GitHub Pages特有のサブディレクトリパスでも静的ファイル（JS, CSS, 音声, 画像）が壊れずロードされることを確認。
+  - `.github/workflows/deploy.yml`: GitHub Actions を用いた公式推奨の自動デプロイパイプライン（`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`）を整備。プッシュ時に自動でテスト・リント・ビルド・デプロイを実行。
+  - `package.json`: `gh-pages` パッケージを追加し、ローカルからワンコマンドで即時デプロイできる `npm run deploy`（`predeploy` 連動）を定義。
+  - 全23件のテストがオールグリーン（PASS）。
+- **REFACTOR**:
+  - `src/__tests__/build-config.test.ts`: ビルド成果物 `dist/index.html` 内の `src` / `href` 属性が絶対パス `/assets/` ではなく相対パス `./assets/` で出力されていることを保証する自動検証シナリオを追加。
+  - `README.md`: GitHub Actions自動デプロイ手順（リポジトリの Pages 設定を「GitHub Actions」にするだけ）および手動デプロイ手順を解説。
+  - `npm run lint`（エラー0件）、`npm run test`（23件全パス）、`npm run build`（正常完了）を確認。
+
+
+
+
